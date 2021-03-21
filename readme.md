@@ -1,5 +1,4 @@
 ## Here is a collection of wallpapers i use.
----
 
 This repo also comes with a python script, `scraper.py`, this is just a simple program made with bs4 that fetches wallpapers from https://www.wallpaperflare.com, so you can view wallpapers inside your terminal.
 Is there really any point to this script? Well, i guess not but it's still there if you want to use it.
