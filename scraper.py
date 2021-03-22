@@ -1,7 +1,7 @@
 # MODULES
 from bs4 import BeautifulSoup # Web scraper
 from requests import get # To get website content and download the image
-from os import system # To clear the screen
+from os import system # To clear the screen and call feh
 
 # Replace this with your command
 image_viewing_command = 'feh temp.jpg'
@@ -30,7 +30,7 @@ def view_images(images): # View images
             else:
                 print('Invalid response, write either `N` or `S`')
 
-    system('rm temp.jpg') # Remote temp file
+    system('rm temp.jpg') # Remove temp file
 
 def clear(): # Clear the Screen
     system('clear')
@@ -47,8 +47,8 @@ clear()
 while True:
     choice = input('> ').lower()
 
-    if choice == 's': # Search
-        query = input('Enter the search query: ')
+    if choice[:2] == 's ': # Search
+        query = choice[2:]
         if query == '':
             print('Write something...')
             continue
