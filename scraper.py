@@ -2,9 +2,18 @@
 from bs4 import BeautifulSoup # Web scraper
 from requests import get # To get website content and download the image
 from os import system # To clear the screen and call feh
+import platform # To determine image_viewing_command
 
-# Replace this with your command
-image_viewing_command = 'feh temp.jpg'
+# Replace this with your command to open images
+if platform.system() == "Darwin":
+    image_viewing_command = 'open temp.jpg'
+elif platform.system() == "Linux":
+    image_viewing_command = 'xdg-open temp.jpg'
+elif platform.system() == "Windows":
+    image_viewing_command = 'start temp.jpg'
+    clear_command = 'cls'
+else:
+    image_viewing_command = ''
 
 # FUNCTIONS
 def view_images(images): # View images
