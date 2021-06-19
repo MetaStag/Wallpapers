@@ -2,12 +2,16 @@
 
 **NOTE:** None of these walls belong to me, all rights go to their respectful owners.
 
-This repo also comes with a python script, `scraper.py`, this is just a simple program made with bs4 that fetches wallpapers from https://www.wallpaperflare.com, so you can view wallpapers inside your terminal.
-Is there really any point to this script? Well, i guess not but it's still there if you want to use it.
+#### wall.py
+This repo also comes with `wall.py`, which is a python cli interface over the wallhaven api. You can browse images based on a search query from your terminal itself (the programm will open images in your default image-viewer).
 
-#### Setup
+You can also save these images locally.
 
-As mentioned earlier, this script uses bs4 so make sure you have that installed
-- Use `pip install BeautifulSoup4` to install it
+###### Features
+- Search & view images from your terminal
+- Search images based on a specific resolution
+- Save images locally
+- Browse through multiple pages instead of just one, to find far more wallpapers!
 
-The program by-default opens images in `feh`. If you don't have it, or want to open images in something else, just open `scraper.py` and change `image_viewing_command` to the corresponding command of your image viewer. For example, with gvenview you would do, `gvenview temp.jpg`
+###### Limitations
+- Cannot browse pages when searching with resolution

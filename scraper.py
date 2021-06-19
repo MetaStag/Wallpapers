@@ -1,89 +1,124 @@
-# MODULES
-from bs4 import BeautifulSoup # Web scraper
-from requests import get # To get website content and download the image
-from os import system # To clear the screen and call feh
-import platform # To determine image_viewing_command
+# A simple cli over wallhaven api
 
-# Replace this with your command to open images
-if platform.system() == "Darwin":
-    image_viewing_command = 'open temp.jpg'
-elif platform.system() == "Linux":
+# MODULES
+from requests import get
+import os
+import platform
+
+
+# VARIABLES
+resolution = '1920x1080'
+clear_command = 'clear'
+if platform.system() == 'Linux':
     image_viewing_command = 'xdg-open temp.jpg'
-elif platform.system() == "Windows":
+elif platform.system() == 'Darwin':
+    image_viewing_command = 'open temp.jpg'
+elif platform.system() == 'Windows':
     image_viewing_command = 'start temp.jpg'
     clear_command = 'cls'
-else:
-    image_viewing_command = ''
 
 # FUNCTIONS
-def view_images(images): # View images
+def view_images(images):
     for i in images:
-        image = i.contents[1].get('data-src') # Get image link
-        print(f'URL | {i.get("href")}') # Print corresponding webpage link
-
-        response = get(image, stream=True) # Download Image
-        with open('temp.jpg', 'wb') as file: # Save to external file
+        response = get(i['path'], stream=True) # Download Image
+        with open('temp.jpg', 'wb') as file: # Save to external file temporarily
             for chunk in response.iter_content(chunk_size=1024):
                 file.write(chunk)
-        system(image_viewing_command) # Display Image
+        os.system(image_viewing_command) # Display Image
 
-        # Prompt to move to next image or stop
-        while True: 
-            choice = input('> (N)ext | (S)top seeing images: ').lower()
+        while True:
+            choice = input('[N]ext | [S]ave | [Q]uit: ').lower()
 
-            if choice == 's': # Stop seeing images
-                system('rm temp.jpg')
-                return
-            elif choice in ['', 'n', 'next']: # Next image
+            if choice in ['', 'n', 'next']:
                 break
+            elif choice in ['s', 'save']:
+                number = 1 
+                while True:
+                    if os.path.exists(f'{number}.jpg'):
+                        number += 1
+                    else:
+                        break
+
+                os.system(f'cp temp.jpg {number}.jpg')
+                print('Successfully saved image!')
+                break
+
+            elif choice in ['q', 'quit']:
+                return
             else:
-                print('Invalid response, write either `N` or `S`')
+                print('Invalid Command...')
 
-    system('rm temp.jpg') # Remove temp file
+def page_browser(query):
+    page = 1
+    while True:
+        search_results = get(f'https://wallhaven.cc/api/v1/search?q={query}&page={page}').json()
+        search_results = search_results['data']
 
-def clear(): # Clear the Screen
-    system('clear')
-    print('Wallpaper Scraper')
-    print('********')
-    print('COMMANDS')
-    print('s - Search for Wallpaper')
-    print('clear - Clear the Screen')
-    print('q/exit - Exit the program')
-    print('********')
+        if search_results == []:
+            print('Page not available. If this is the first page you\'re visiting, then your query returned no results, and if it\'s not, then the last page was the last page of the results')
+        else:
+            view_images(search_results)
+
+        choice = input(f'Current: {page} | (N)ext page | (P)revious page | (Q)quit: ').lower()
+
+        if choice in ['n', 'next']:
+            page += 1
+
+        elif choice in ['p', 'previous']:
+            if page < 2:
+                print(f'Can\'t go to the previous page, you\'re already at the page {page}!')
+            else:
+                page -= 1
+        elif choice in ['q', 'quit']:
+            return
+        else:
+            print('Invalid Command, relooping current page...')
+
+def clear():
+    os.system(clear_command)
+    print('Wallhaven API')
+    print('*******')
+    print('s - Search')
+    print('sr - Search with resolution')
+    print('r - Set resolution')
+    print('clear - Clear Screen')
+    print('q/exit - Exit')
+    print('*******')
+
+clear()
 
 # MAIN LOOP
-clear()
 while True:
     choice = input('> ').lower()
 
-    if choice[:2] == 's ': # Search
-        query = choice[2:]
-        if query == '':
-            print('Write something...')
-            continue
+    if choice == 's': # Search by name
+        query = input('Enter search query: ')
+        query = query.replace(' ', '%20')
+        page_browser(query)
 
-        # Make the beautiful soup object
-        sauce = get(f'https://www.wallpaperflare.com/search?wallpaper={query}').text
-        soup = BeautifulSoup(sauce, 'lxml')
+    elif choice == 'sr': # Search with resolution
+        query = input('Enter search query: ')
+        query = query.replace(' ', '%20')
+        search_results = get(f'https://wallhaven.cc/api/v1/search?q={query}&resolutions={resolution}').json()
+        search_results = search_results['data']
 
-        # Get all the links on the page
-        links = soup.find_all('a')
-        if len(links) == 2: # No image links were found, i.e, 0 results
-            print('No results were found...')
-            continue
+        if search_results == []:
+            print('Your search query returned no results, try something else...')
+        else:
+            view_images(search_results)
 
-        # Filter image urls from the rest
-        images = []
-        for i in links:
-            if i.get('itemprop') == 'url':
-                images.append(i)
-        images.pop(0)
+    elif choice == 'r': # Set resoluton
+        new = input(f'The current resolution is {resolution}, enter the new resolution: ')
 
-        view_images(images)
+        if new.find('x') == -1 or not (new[:new.index('x')].isnumeric() and new[new.index('x')+1:].isnumeric()):
+            print('Invalid syntax, it should be `<int>x<int>`')
+        else:
+            resolution = new
+            print(f'Your resolution has now been updated to {resolution}!')
 
-    elif choice == 'clear': # Clear the Screen
+    elif choice == 'clear': # Clear screen
         clear()
-    elif choice in ['q', 'exit']: # Exit the program
+    elif choice in ['q', 'exit']: # Quit
         exit()
     else:
         print('Invalid Command...')
