@@ -2,7 +2,6 @@
 <img align='center' alt='Cottage' src='Cottage.jpg'>
 <img align='center' alt='Dawn' src='Dawn.jpg'>
 <img align='center' alt='Night' src='Night(1).jpg'>
-<img align='center' alt='Night' src='Night(2).jpg'>
 <img align='center' alt='Purple' src='Purple.jpg'>
 <img align='center' alt='Road_Blur' src='Road_Blur.jpg'>
 <img align='center' alt='Rooftops' src='Rooftops.jpg'>
